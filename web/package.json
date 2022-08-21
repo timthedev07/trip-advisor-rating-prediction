@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@tensorflow/tfjs": "^3.19.0",
     "dragontail-experimental": "^0.0.63",
     "next": "12.2.5",
     "react": "18.2.0",
