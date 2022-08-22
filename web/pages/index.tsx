@@ -7,7 +7,13 @@ import {
 } from "dragontail-experimental";
 import type { NextPage } from "next";
 import { Bar } from "react-chartjs-2";
-import { loadLayersModel } from "@tensorflow/tfjs";
+import {
+  GraphModel,
+  loadGraphModel,
+  tensor1d,
+  Tensor,
+  Rank,
+} from "@tensorflow/tfjs";
 import {
   Chart as ChartJS,
   BarController,
@@ -40,36 +46,37 @@ export const metadata = {
 const Home: NextPage = () => {
   const [text, setText] = useState<string | null>(null);
   const chartRef = useRef<ChartJS | null>(null);
-  const [model, setModel] = useState();
+  const [model, setModel] = useState<GraphModel | null>(null);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     if (!text || text.length < 64) {
       return;
     }
 
-    const loaded = loadLayersModel();
+    let currModel: GraphModel;
+
+    if (!model) {
+      currModel = await loadGraphModel(
+        "https://raw.githubusercontent.com/timthedev07/trip-advisor-rating-prediction/dev/model/model.json"
+      );
+      setModel(currModel);
+    } else {
+      currModel = model;
+    }
 
     const chart = chartRef.current;
     if (!chart) return;
 
-    fetch("/", {
-      method: "POST",
-      body: JSON.stringify({
-        text,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }).then(async (res) => {
-      const result = await res.json();
+    const [result] = (await currModel.executeAsync(
+      tensor1d([text])
+    )) as Tensor<Rank>[];
 
-      const { distribution }: { distribution: number[] } = result;
+    const distribution = (await result.array()) as number[];
 
-      chart.data.datasets[0].data = distribution;
-      chart.update();
-    });
+    chart.data.datasets[0].data = distribution;
+    chart.update();
   };
 
   return (
@@ -114,6 +121,9 @@ const Home: NextPage = () => {
                   const newText = e.target.value;
                   setText(newText);
                 }}
+                style={{
+                  minHeight: "170px",
+                }}
                 placeholder={"Enter Review Here"}
               ></Textarea>
               {!!text && text.length < 64 && text.length > 0 ? (
@@ -138,7 +148,7 @@ const Home: NextPage = () => {
               data={{
                 datasets: [
                   {
-                    data: [1, 2, 3, 4, 5],
+                    data: [0, 0, 0, 0, 0],
                     label: "HEY",
                     backgroundColor: [
                       "rgba(75, 192, 192, 0.6)",
