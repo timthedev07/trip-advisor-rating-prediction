@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@tensorflow/tfjs-node": "^3.19.0",
+    "@tensorflow/tfjs": "^3.19.0",
     "chart.js": "^3.9.1",
     "dragontail-experimental": "^0.0.63",
     "next": "12.2.5",

@@ -7,6 +7,7 @@ import {
 } from "dragontail-experimental";
 import type { NextPage } from "next";
 import { Bar } from "react-chartjs-2";
+import { loadLayersModel } from "@tensorflow/tfjs";
 import {
   Chart as ChartJS,
   BarController,
@@ -39,6 +40,7 @@ export const metadata = {
 const Home: NextPage = () => {
   const [text, setText] = useState<string | null>(null);
   const chartRef = useRef<ChartJS | null>(null);
+  const [model, setModel] = useState();
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -46,6 +48,8 @@ const Home: NextPage = () => {
     if (!text || text.length < 64) {
       return;
     }
+
+    const loaded = loadLayersModel();
 
     const chart = chartRef.current;
     if (!chart) return;
