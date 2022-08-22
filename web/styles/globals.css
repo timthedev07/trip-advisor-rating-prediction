@@ -27,6 +27,11 @@ body {
   max-height: 500px;
   width: 80%;
   min-width: 280px;
+  min-height: 300px;
+}
+
+.bar-container canvas {
+  height: 100%;
 }
 
 .page {

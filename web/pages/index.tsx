@@ -110,6 +110,8 @@ const Home: NextPage = () => {
               labels: [1, 2, 3, 4, 5],
             }}
             options={{
+              responsive: true,
+              maintainAspectRatio: false,
               plugins: {
                 title: {
                   display: true,
